@@ -119,7 +119,6 @@ function initCommands()
          ["font-family-other", cmdFont,                                      0],
          ["font-size",         cmdFont,                            CMD_CONSOLE],
          ["font-size-other",   cmdFont,                                      0],
-         ["goto-startup",      cmdGotoStartup,                     CMD_CONSOLE],
          ["goto-url",          cmdGotoURL,                                   0],
          ["goto-url-newwin",   cmdGotoURL,                                   0],
          ["goto-url-newtab",   cmdGotoURL,                                   0],
@@ -2193,11 +2192,6 @@ function cmdFocusInput(e)
         document.commandDispatcher.focusedElement = client.input;
 }
 
-function cmdGotoStartup(e)
-{
-    openStartupURLs();
-}
-
 function cmdGotoURL(e)
 {
     const EXT_PROTO_SVC = "@mozilla.org/uriloader/external-protocol-service;1";
@@ -2579,19 +2573,18 @@ function cmdLoad(e)
         if ("init" in plugin)
         {
             // Sanity check plugin's methods and properties:
-            var okay = false;
             if (!("id" in plugin) || (plugin.id == MSG_UNKNOWN))
                 display(getMsg(MSG_ERR_PLUGINAPI_NOID, e.url));
-            else if (!(plugin.id.match(/^[A-Za-z0-9-_]+$/)))
+            else if (!(plugin.id.match(/^[A-Za-z-_]+$/)))
                 display(getMsg(MSG_ERR_PLUGINAPI_FAULTYID, e.url));
             else if (!("enable" in plugin))
                 display(getMsg(MSG_ERR_PLUGINAPI_NOENABLE, e.url));
             else if (!("disable" in plugin))
                 display(getMsg(MSG_ERR_PLUGINAPI_NODISABLE, e.url));
-            else
-                okay = true;
 
-            if (!okay)
+            if (!("enable" in plugin) || !("disable" in plugin) ||
+                !("id" in plugin) || (plugin.id == MSG_UNKNOWN) ||
+                !(plugin.id.match(/^[A-Za-z-_]+$/)))
             {
                 display (getMsg(MSG_ERR_SCRIPTLOAD, e.url));
                 return null;

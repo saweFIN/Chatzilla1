@@ -679,7 +679,8 @@ function processOpFilterStart(opData)
 
     // Update special "create channel" row, and select it.
     createChannelItem.name = opData.channelText;
-    createChannelItem.unHide();
+    if (createChannelItem.isHidden)
+        createChannelItem.unHide();
 
     // Scroll to the top and select the "create channel" row.
     channelTreeView.selectedIndex = 0;
@@ -718,9 +719,9 @@ function processOpFilterRun(opData)
         if (opData.maxUsers && (c.users > opData.maxUsers))
             match = false;
 
-        if (match)
+        if (c.isHidden && match)
             c.unHide();
-        else
+        if (!c.isHidden && !match)
             c.hide();
 
         if (match && (c.nameLC == opData.channelText))
@@ -758,7 +759,8 @@ function processOpFilterStop(opData)
 {
     if (opData.exactMatch)
     {
-        createChannelItem.hide();
+        if (!createChannelItem.isHidden)
+            createChannelItem.hide();
     }
     // If nothing is selected, select the "create channel" row.
     else if (channelTreeView.selectedIndex < 0)
